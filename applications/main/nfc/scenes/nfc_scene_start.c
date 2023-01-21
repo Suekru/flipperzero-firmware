@@ -1,5 +1,6 @@
 #include "../nfc_i.h"
 #include "nfc_worker_i.h"
+#include "../zone_info.h"
 #include <dolphin/dolphin.h>
 
 enum SubmenuIndex {
@@ -9,6 +10,7 @@ enum SubmenuIndex {
     SubmenuIndexExtraAction,
     SubmenuIndexAddManually,
     SubmenuIndexDebug,
+    SubmenuIndexZoneEmulator
 };
 
 void nfc_scene_start_submenu_callback(void* context, uint32_t index) {
@@ -25,6 +27,7 @@ void nfc_scene_start_on_enter(void* context) {
     submenu_add_item(
         submenu, "Detect Reader", SubmenuIndexDetectReader, nfc_scene_start_submenu_callback, nfc);
     submenu_add_item(submenu, "Saved", SubmenuIndexSaved, nfc_scene_start_submenu_callback, nfc);
+    submenu_add_item(submenu, "Zone Emulator", SubmenuIndexZoneEmulator, nfc_scene_start_submenu_callback, nfc);
     submenu_add_item(
         submenu, "Extra Actions", SubmenuIndexExtraAction, nfc_scene_start_submenu_callback, nfc);
     submenu_add_item(
@@ -62,9 +65,12 @@ bool nfc_scene_start_on_event(void* context, SceneManagerEvent event) {
                 scene_manager_next_scene(nfc->scene_manager, NfcSceneDictNotFound);
             }
             consumed = true;
+        } else if(event.event == SubmenuIndexZoneEmulator) {
+                scene_manager_next_scene(nfc->scene_manager, NfcSceneZoneList);
+                consumed = true;
         } else if(event.event == SubmenuIndexSaved) {
-            scene_manager_next_scene(nfc->scene_manager, NfcSceneFileSelect);
-            consumed = true;
+                scene_manager_next_scene(nfc->scene_manager, NfcSceneFileSelect);
+                consumed = true;
         } else if(event.event == SubmenuIndexExtraAction) {
             scene_manager_next_scene(nfc->scene_manager, NfcSceneExtraActions);
             consumed = true;

@@ -1,4 +1,5 @@
 #include "../nfc_i.h"
+#include "../zone_info.h"
 
 #define NFC_MF_UL_DATA_NOT_CHANGED (0UL)
 #define NFC_MF_UL_DATA_CHANGED (1UL)
@@ -14,7 +15,6 @@ bool nfc_mf_ultralight_emulate_worker_callback(NfcWorkerEvent event, void* conte
 
 void nfc_scene_mf_ultralight_emulate_on_enter(void* context) {
     Nfc* nfc = context;
-
     // Setup view
     MfUltralightType type = nfc->dev->dev_data.mf_ul_data.type;
     bool is_ultralight = (type == MfUltralightTypeUL11) || (type == MfUltralightTypeUL21) ||

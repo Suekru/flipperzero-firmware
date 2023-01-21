@@ -109,7 +109,9 @@ Nfc* nfc_alloc() {
 
 void nfc_free(Nfc* nfc) {
     furi_assert(nfc);
-
+    free(nfc->zoneNum);
+    free(nfc->delay);
+    free(nfc->chipNum);
     if(nfc->rpc_state == NfcRpcStateEmulating) {
         // Stop worker
         nfc_worker_stop(nfc->worker);

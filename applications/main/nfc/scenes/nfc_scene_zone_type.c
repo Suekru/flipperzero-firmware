@@ -1,0 +1,97 @@
+#include <stdio.h>
+#include "string.h"
+#include "../zone_info.h"
+#include "../nfc_i.h"
+
+
+enum SubmenuIndex {
+    SubmenuIndexAutomatic,
+    SubmenuIndexManual,
+};
+
+void nfc_scene_zone_type_submenu_callback(void* context, uint32_t index) {
+    Nfc* nfc = context;
+
+    view_dispatcher_send_custom_event(nfc->view_dispatcher, index);
+}
+
+
+void play_zone_chip(const char* chip, int delay, int chipNum){
+    Nfc* nfc = nfc_alloc();
+    *nfc->delay = delay;
+    *nfc->chipNum = chipNum;
+    // Check argument and run corresponding scene
+    view_dispatcher_attach_to_gui(nfc->view_dispatcher, nfc->gui, ViewDispatcherTypeFullscreen);
+    if(nfc_device_load(nfc->dev, chip, true)) {
+        if(nfc->dev->format == NfcDeviceSaveFormatMifareUl) {
+            scene_manager_next_scene(nfc->scene_manager, NfcSceneMfUltralightEmulate);
+        } else if(nfc->dev->format == NfcDeviceSaveFormatMifareClassic) {
+            scene_manager_next_scene(nfc->scene_manager, NfcSceneMfClassicEmulate);
+        } else if(nfc->dev->format == NfcDeviceSaveFormatBankCard) {
+            scene_manager_next_scene(nfc->scene_manager, NfcSceneDeviceInfo);
+        } else {
+            scene_manager_next_scene(nfc->scene_manager, NfcSceneEmulateUid);
+        }
+    } else {
+        // Exit app
+        view_dispatcher_stop(nfc->view_dispatcher);
+    }
+    view_dispatcher_run(nfc->view_dispatcher);
+
+    nfc_free(nfc);
+}
+
+void play_zone(){
+    const char* file_extension = ".nfc";
+    const char** zone_list = chipNames[zone];
+    const int* times = chipTimes[zone];
+    const int* length = &zoneLengths[zone];
+    FuriString* path = furi_string_alloc_set("/any/nfc/Zones/");
+    furi_string_cat_str(path, zoneName);
+    FuriString* chip = furi_string_alloc();
+
+    for(int i = 0; i < *length; i++){
+        furi_string_set_str(chip, zone_list[i]);
+        furi_string_cat_str(chip, file_extension);
+
+        furi_string_cat(path, chip);
+
+        play_zone_chip(furi_string_get_cstr(path), times[i], i+1);
+        furi_string_trim(path, furi_string_get_cstr(chip));
+    }
+    furi_string_free(path);
+    furi_string_free(chip);
+}
+
+void nfc_scene_zone_type_on_enter(void* context) {
+    Nfc* nfc = context;
+    Submenu* submenu = nfc->submenu;
+
+    submenu_add_item(submenu, "Automatic", SubmenuIndexAutomatic, nfc_scene_zone_type_submenu_callback, nfc);
+    submenu_add_item(submenu, "Manual", SubmenuIndexManual, nfc_scene_zone_type_submenu_callback, nfc);
+
+    submenu_set_selected_item(
+            submenu, scene_manager_get_scene_state(nfc->scene_manager, NfcSceneZoneType));
+
+    nfc_device_clear(nfc->dev);
+    view_dispatcher_switch_to_view(nfc->view_dispatcher, NfcViewMenu);
+}
+
+bool nfc_scene_zone_type_on_event(void* context, SceneManagerEvent event) {
+    Nfc* nfc = context;
+    bool consumed = false;
+
+    if(event.type == SceneManagerEventTypeCustom) {
+        if(event.event == SubmenuIndexAutomatic){
+            play_zone();
+        }
+        scene_manager_set_scene_state(nfc->scene_manager, NfcSceneZoneType, event.event);
+    }
+    return consumed;
+}
+
+void nfc_scene_zone_type_on_exit(void* context) {
+    Nfc* nfc = context;
+
+    submenu_reset(nfc->submenu);
+}

@@ -53,6 +53,10 @@ typedef enum {
 } NfcRpcState;
 
 struct Nfc {
+    char* zoneNum;
+    int* delay;
+    int* chipNum;
+    int* chipCount;
     NfcWorker* worker;
     ViewDispatcher* view_dispatcher;
     Gui* gui;
@@ -112,6 +116,8 @@ void nfc_blink_emulate_start(Nfc* nfc);
 void nfc_blink_detect_start(Nfc* nfc);
 
 void nfc_blink_stop(Nfc* nfc);
+
+void nfc_free(Nfc* nfc);
 
 bool nfc_save_file(Nfc* nfc);
 
