@@ -20,6 +20,7 @@ void nfc_scene_mf_ultralight_emulate_on_enter(void* context) {
     bool is_ultralight = (type == MfUltralightTypeUL11) || (type == MfUltralightTypeUL21) ||
                          (type == MfUltralightTypeUnknown);
     Popup* popup = nfc->popup;
+
     popup_set_header(popup, "Emulating", 67, 13, AlignLeft, AlignTop);
     if(strcmp(nfc->dev->dev_name, "") != 0) {
         nfc_text_store_set(nfc, "%s", nfc->dev->dev_name);

@@ -35,7 +35,7 @@ static void nfc_rpc_command_callback(RpcAppSystemEvent event, void* context) {
 
 Nfc* nfc_alloc() {
     Nfc* nfc = malloc(sizeof(Nfc));
-
+    nfc->chipNum = malloc(sizeof(int));
     nfc->worker = nfc_worker_alloc();
     nfc->view_dispatcher = view_dispatcher_alloc();
     nfc->scene_manager = scene_manager_alloc(&nfc_scene_handlers, nfc);
@@ -109,8 +109,6 @@ Nfc* nfc_alloc() {
 
 void nfc_free(Nfc* nfc) {
     furi_assert(nfc);
-    free(nfc->zoneNum);
-    free(nfc->delay);
     free(nfc->chipNum);
     if(nfc->rpc_state == NfcRpcStateEmulating) {
         // Stop worker

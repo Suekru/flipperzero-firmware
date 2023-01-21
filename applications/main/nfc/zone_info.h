@@ -6,7 +6,7 @@
 #define FLIPPERZERO_FIRMWARE_ZONE_INFO_H
 
 extern int zone;
-extern char* zoneName;
+extern char zoneName[];
 
 extern const char* chipNames[5][21];
 extern const int chipTimes[5][21];

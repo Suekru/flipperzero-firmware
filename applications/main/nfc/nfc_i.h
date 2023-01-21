@@ -53,10 +53,7 @@ typedef enum {
 } NfcRpcState;
 
 struct Nfc {
-    char* zoneNum;
-    int* delay;
     int* chipNum;
-    int* chipCount;
     NfcWorker* worker;
     ViewDispatcher* view_dispatcher;
     Gui* gui;
