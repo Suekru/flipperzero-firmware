@@ -1,6 +1,7 @@
 #include "../nfc_i.h"
 #include "nfc_worker_i.h"
 #include "../zone_info.h"
+#include "../zone_utilities.h"
 #include <dolphin/dolphin.h>
 
 enum SubmenuIndex {
@@ -15,7 +16,9 @@ enum SubmenuIndex {
 
 void nfc_scene_start_submenu_callback(void* context, uint32_t index) {
     Nfc* nfc = context;
-
+    zoneName = "Zone 0";
+    zone = 0;
+    isAutomatic = 0;
     view_dispatcher_send_custom_event(nfc->view_dispatcher, index);
 }
 

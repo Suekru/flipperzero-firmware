@@ -2,6 +2,7 @@
 #include "string.h"
 #include "../nfc_i.h"
 #include "../zone_info.h"
+#include "../zone_utilities.h"
 
 
 enum SubmenuIndex {
@@ -44,22 +45,28 @@ bool nfc_scene_zone_list_on_event(void* context, SceneManagerEvent event) {
 
     if(event.type == SceneManagerEventTypeCustom) {
         if(event.event == SubmenuIndexZone1) {
-            //set_zone("Zone 1");
+            zone = 1;
+            zoneName = "Zone 1";
             consumed = true;
         } else if(event.event == SubmenuIndexZone2) {
-            //set_zone("Zone 2");
+            zone = 2;
+            zoneName = "Zone 2";
             consumed = true;
         } else if(event.event == SubmenuIndexZone3) {
-            //set_zone("Zone 3");
+            zone = 3;
+            zoneName = "Zone 3";
             consumed = true;
         } else if(event.event == SubmenuIndexZone4) {
             zone = 4;
+            zoneName = "Zone 4";
             consumed = true;
         } else if(event.event == SubmenuIndexZone5) {
-            //set_zone("Zone 5", 21);
+            zone = 5;
+            zoneName = "Zone 5";
             consumed = true;
         } else if(event.event == SubmenuIndexZone10){
-            //set_zone("Zone 10", 30);
+            zone = 10;
+            zoneName = "Zone 10";
             consumed = true;
         }
         scene_manager_next_scene(nfc->scene_manager, NfcSceneZoneType);
@@ -70,6 +77,5 @@ bool nfc_scene_zone_list_on_event(void* context, SceneManagerEvent event) {
 
 void nfc_scene_zone_list_on_exit(void* context) {
     Nfc* nfc = context;
-
     submenu_reset(nfc->submenu);
 }

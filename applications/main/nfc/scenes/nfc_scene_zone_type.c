@@ -2,6 +2,7 @@
 #include "string.h"
 #include "../zone_info.h"
 #include "../nfc_i.h"
+#include "../zone_utilities.h"
 
 
 enum SubmenuIndex {
@@ -11,34 +12,12 @@ enum SubmenuIndex {
 
 void nfc_scene_zone_type_submenu_callback(void* context, uint32_t index) {
     Nfc* nfc = context;
-
+    automaticZoneCancelled = 0;
     view_dispatcher_send_custom_event(nfc->view_dispatcher, index);
 }
 
 
-void play_zone_chip(const char* chip, int chipNum){
-    Nfc* nfc = nfc_alloc();
-    *nfc->chipNum = chipNum;
-    // Check argument and run corresponding scene
-    view_dispatcher_attach_to_gui(nfc->view_dispatcher, nfc->gui, ViewDispatcherTypeFullscreen);
-    if(nfc_device_load(nfc->dev, chip, true)) {
-        if(nfc->dev->format == NfcDeviceSaveFormatMifareUl) {
-            scene_manager_next_scene(nfc->scene_manager, NfcSceneMfUltralightEmulate);
-        } else if(nfc->dev->format == NfcDeviceSaveFormatMifareClassic) {
-            scene_manager_next_scene(nfc->scene_manager, NfcSceneMfClassicEmulate);
-        } else if(nfc->dev->format == NfcDeviceSaveFormatBankCard) {
-            scene_manager_next_scene(nfc->scene_manager, NfcSceneDeviceInfo);
-        } else {
-            scene_manager_next_scene(nfc->scene_manager, NfcSceneEmulateUid);
-        }
-    } else {
-        // Exit app
-        view_dispatcher_stop(nfc->view_dispatcher);
-    }
-    view_dispatcher_run(nfc->view_dispatcher);
 
-    nfc_free(nfc);
-}
 
 void play_zone(){
     const char* file_extension = ".nfc";
@@ -48,6 +27,7 @@ void play_zone(){
     FuriString* chip = furi_string_alloc();
 
     for(int i = 0; i < zoneLengths[zone]; i++){
+        if(automaticZoneCancelled) break;
         furi_string_set_str(chip, chipNames[zone][i]);
         furi_string_cat_str(chip, file_extension);
 
@@ -80,8 +60,17 @@ bool nfc_scene_zone_type_on_event(void* context, SceneManagerEvent event) {
 
     if(event.type == SceneManagerEventTypeCustom) {
         if(event.event == SubmenuIndexAutomatic){
+            isAutomatic = 1;
             play_zone();
         }
+        else if(event.event == SubmenuIndexManual){
+            isAutomatic = 0;
+            if(zone == 2)
+                scene_manager_next_scene(nfc->scene_manager, NfcSceneZone2);
+            else if(zone == 4)
+                scene_manager_next_scene(nfc->scene_manager, NfcSceneZone4);
+        }
+        consumed = true;
         scene_manager_set_scene_state(nfc->scene_manager, NfcSceneZoneType, event.event);
     }
     return consumed;
@@ -89,6 +78,5 @@ bool nfc_scene_zone_type_on_event(void* context, SceneManagerEvent event) {
 
 void nfc_scene_zone_type_on_exit(void* context) {
     Nfc* nfc = context;
-
     submenu_reset(nfc->submenu);
 }

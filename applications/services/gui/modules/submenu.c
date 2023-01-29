@@ -4,6 +4,7 @@
 #include <gui/elements.h>
 #include <furi.h>
 
+#include "../../../main/nfc/zone_utilities.h"
 struct Submenu {
     View* view;
 };
@@ -327,6 +328,7 @@ void submenu_process_ok(Submenu* submenu) {
             const size_t items_size = SubmenuItemArray_size(model->items);
             if(model->position < items_size) {
                 item = SubmenuItemArray_get(model->items, model->position);
+                submenuIndex = model->position;
             }
         },
         true);

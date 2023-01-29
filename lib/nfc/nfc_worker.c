@@ -1,4 +1,5 @@
 #include "nfc_worker_i.h"
+#include "../../applications/main/nfc/zone_utilities.h"
 #include <furi_hal.h>
 
 #include <platform.h>
