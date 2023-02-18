@@ -9,8 +9,9 @@
 
 extern char* zoneName;
 
-extern const char* chipNames[5][38];
-extern const int chipTimes[5][38];
+extern const char zoneChars[11];
+extern const char* chipNames[11][38];
+extern const int chipTimes[11][38];
 extern const int zoneLengths[];
 
 #endif //FLIPPERZERO_FIRMWARE_ZONE_INFO_H

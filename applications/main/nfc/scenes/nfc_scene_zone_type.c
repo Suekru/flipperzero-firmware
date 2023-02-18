@@ -65,10 +65,11 @@ bool nfc_scene_zone_type_on_event(void* context, SceneManagerEvent event) {
         }
         else if(event.event == SubmenuIndexManual){
             isAutomatic = 0;
-            if(zone == 2)
-                scene_manager_next_scene(nfc->scene_manager, NfcSceneZone2);
+            scene_manager_next_scene(nfc->scene_manager, NfcSceneZoneChipMenu);
+            /*if(zone == 2)
+                scene_manager_next_scene(nfc->scene_manager, );
             else if(zone == 4)
-                scene_manager_next_scene(nfc->scene_manager, NfcSceneZone4);
+                scene_manager_next_scene(nfc->scene_manager, NfcSceneZone4);*/
         }
         consumed = true;
         scene_manager_set_scene_state(nfc->scene_manager, NfcSceneZoneType, event.event);
